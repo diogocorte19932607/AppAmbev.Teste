@@ -51,11 +51,6 @@ public class AuthController : BaseController
 
         _logger.LogInformation("User authenticated successfully: {Email}", request.Email);
 
-        return Ok(new ApiResponseWithData<AuthenticateUserResponse>
-        {
-            Success = true,
-            Message = "User authenticated successfully",
-            Data = _mapper.Map<AuthenticateUserResponse>(response)
-        });
+        return Ok<AuthenticateUserResponse>(_mapper.Map<AuthenticateUserResponse>(response), "User authenticated successfully");
     }
 }

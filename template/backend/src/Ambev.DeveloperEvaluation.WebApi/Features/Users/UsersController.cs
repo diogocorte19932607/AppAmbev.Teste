@@ -54,12 +54,7 @@ public class UsersController : BaseController
 
         _logger.LogInformation("User created successfully: {UserId}", response.Id);
 
-        return Created(string.Empty, new ApiResponseWithData<CreateUserResponse>
-        {
-            Success = true,
-            Message = "User created successfully",
-            Data = _mapper.Map<CreateUserResponse>(response)
-        });
+        return Created<CreateUserResponse>(string.Empty, null, _mapper.Map<CreateUserResponse>(response), "User created successfully");
     }
 
     /// <summary>
@@ -82,12 +77,7 @@ public class UsersController : BaseController
 
         _logger.LogInformation("User retrieved successfully: {UserId}", response.Id);
 
-        return Ok(new ApiResponseWithData<GetUserResponse>
-        {
-            Success = true,
-            Message = "User retrieved successfully",
-            Data = _mapper.Map<GetUserResponse>(response)
-        });
+        return Ok<GetUserResponse>(_mapper.Map<GetUserResponse>(response), "User retrieved successfully");
     }
 
     /// <summary>
