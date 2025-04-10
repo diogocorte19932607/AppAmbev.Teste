@@ -49,15 +49,6 @@ public class UsersController : BaseController
     {
         _logger.LogInformation("Received request to create user with email: {Email}", request.Email);
 
-        var validator = new CreateUserRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Validation failed for CreateUser: {@Errors}", validationResult.Errors);
-            return BadRequest(validationResult.Errors);
-        }
-
         var command = _mapper.Map<CreateUserCommand>(request);
         var response = await _mediator.Send(command, cancellationToken);
 
@@ -83,18 +74,9 @@ public class UsersController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Received request to get user with ID: {UserId}", id);
+        _logger.LogInformation("Received request to retrieve user: {UserId}", id);
 
         var request = new GetUserRequest { Id = id };
-        var validator = new GetUserRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Validation failed for GetUser: {@Errors}", validationResult.Errors);
-            return BadRequest(validationResult.Errors);
-        }
-
         var command = _mapper.Map<GetUserCommand>(request.Id);
         var response = await _mediator.Send(command, cancellationToken);
 
@@ -120,18 +102,9 @@ public class UsersController : BaseController
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteUser([FromRoute] Guid id, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Received request to delete user with ID: {UserId}", id);
+        _logger.LogInformation("Received request to delete user: {UserId}", id);
 
         var request = new DeleteUserRequest { Id = id };
-        var validator = new DeleteUserRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Validation failed for DeleteUser: {@Errors}", validationResult.Errors);
-            return BadRequest(validationResult.Errors);
-        }
-
         var command = _mapper.Map<DeleteUserCommand>(request.Id);
         await _mediator.Send(command, cancellationToken);
 

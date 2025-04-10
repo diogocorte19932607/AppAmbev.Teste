@@ -46,37 +46,16 @@ public class AuthController : BaseController
     {
         _logger.LogInformation("Received authentication request for user: {Email}", request.Email);
 
-        var validator = new AuthenticateUserRequestValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        var command = _mapper.Map<AuthenticateUserCommand>(request);
+        var response = await _mediator.Send(command, cancellationToken);
 
-        if (!validationResult.IsValid)
+        _logger.LogInformation("User authenticated successfully: {Email}", request.Email);
+
+        return Ok(new ApiResponseWithData<AuthenticateUserResponse>
         {
-            _logger.LogWarning("Validation failed for authentication request: {@Errors}", validationResult.Errors);
-            return BadRequest(validationResult.Errors);
-        }
-
-        try
-        {
-            var command = _mapper.Map<AuthenticateUserCommand>(request);
-            var response = await _mediator.Send(command, cancellationToken);
-
-            _logger.LogInformation("User authenticated successfully: {Email}", request.Email);
-
-            return Ok(new ApiResponseWithData<AuthenticateUserResponse>
-            {
-                Success = true,
-                Message = "User authenticated successfully",
-                Data = _mapper.Map<AuthenticateUserResponse>(response)
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while authenticating user: {Email}", request.Email);
-            return StatusCode(500, new ApiResponse
-            {
-                Success = false,
-                Message = "An unexpected error occurred during authentication"
-            });
-        }
+            Success = true,
+            Message = "User authenticated successfully",
+            Data = _mapper.Map<AuthenticateUserResponse>(response)
+        });
     }
 }
