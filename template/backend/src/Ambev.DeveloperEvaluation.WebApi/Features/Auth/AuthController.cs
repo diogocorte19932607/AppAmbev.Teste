@@ -40,7 +40,7 @@ public class AuthController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Authentication token if successful</returns>
     [HttpPost]
-    [ProducesResponseType(typeof(ApiResponse<AuthenticateUserResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseWithData<AuthenticateUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AuthenticateUser([FromBody] AuthenticateUserRequest request, CancellationToken cancellationToken)
@@ -54,7 +54,7 @@ public class AuthController : BaseController
         {
             var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
             _logger.LogWarning("Authentication validation failed for user: {Email}", request.Email);
-            return BadRequest(ApiResponse<string>.Fail(errors, "Validation failed"));
+            return BadRequest(ApiResponse<string>.Fail("Validation failed: " + string.Join(", ", errors)));
         }
 
         var command = _mapper.Map<AuthenticateUserCommand>(request);
@@ -63,6 +63,6 @@ public class AuthController : BaseController
 
         _logger.LogInformation("User authenticated successfully: {Email}", request.Email);
 
-        return Ok(ApiResponse<AuthenticateUserResponse>.Ok(result, "User authenticated successfully"));
+        return Ok(ApiResponseWithData<AuthenticateUserResponse>.Success(result, "User authenticated successfully"));
     }
 }

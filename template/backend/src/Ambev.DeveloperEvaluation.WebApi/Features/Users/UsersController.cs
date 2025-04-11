@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Ambev.DeveloperEvaluation.WebApi.Common;
@@ -37,6 +38,7 @@ public class UsersController : BaseController
         _logger = logger;
     }
 
+
     /// <summary>
     /// Creates a new user
     /// </summary>
@@ -44,7 +46,7 @@ public class UsersController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created user details</returns>
     [HttpPost]
-    [ProducesResponseType(typeof(ApiResponse<CreateUserResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponseWithData<CreateUserResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
     {
@@ -55,8 +57,8 @@ public class UsersController : BaseController
 
         if (!validationResult.IsValid)
         {
-            var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            return BadRequest(ApiResponse<string>.Fail(errorMessages, "Validation failed"));
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            return BadRequest(ApiResponse<string>.Fail("Validation failed: " + string.Join(", ", errors)));
         }
 
         var command = _mapper.Map<CreateUserCommand>(request);
@@ -65,8 +67,9 @@ public class UsersController : BaseController
 
         _logger.LogInformation("User created successfully: {UserId}", response.Id);
 
-        return Created(string.Empty, ApiResponse<CreateUserResponse>.Ok(result, "User created successfully"));
+        return Created(string.Empty, ApiResponseWithData<CreateUserResponse>.Success(result, "User created successfully"));
     }
+
 
     /// <summary>
     /// Retrieves a user by their ID
@@ -75,7 +78,7 @@ public class UsersController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The user details if found</returns>
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(ApiResponse<GetUserResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponseWithData<GetUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUser([FromRoute] Guid id, CancellationToken cancellationToken)
@@ -88,8 +91,8 @@ public class UsersController : BaseController
 
         if (!validationResult.IsValid)
         {
-            var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            return BadRequest(ApiResponse<string>.Fail(errorMessages, "Validation failed"));
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            return BadRequest(ApiResponse<string>.Fail("Validation failed: " + string.Join(", ", errors)));
         }
 
         var command = _mapper.Map<GetUserCommand>(request.Id);
@@ -104,7 +107,7 @@ public class UsersController : BaseController
         _logger.LogInformation("User retrieved successfully: {UserId}", response.Id);
 
         var result = _mapper.Map<GetUserResponse>(response);
-        return Ok(ApiResponse<GetUserResponse>.Ok(result, "User retrieved successfully"));
+        return Ok(ApiResponseWithData<GetUserResponse>.Success(result, "User retrieved successfully"));
     }
 
     /// <summary>
@@ -127,8 +130,8 @@ public class UsersController : BaseController
 
         if (!validationResult.IsValid)
         {
-            var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            return BadRequest(ApiResponse<string>.Fail(errorMessages, "Validation failed"));
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            return BadRequest(ApiResponse<string>.Fail("Validation failed: " + string.Join(", ", errors)));
         }
 
         var command = _mapper.Map<DeleteUserCommand>(request.Id);
@@ -136,6 +139,6 @@ public class UsersController : BaseController
 
         _logger.LogInformation("User deleted successfully: {UserId}", id);
 
-        return Ok(ApiResponse<string>.Ok(null, "User deleted successfully"));
+        return Ok(ApiResponse<string>.Ok("User deleted successfully"));
     }
 }
