@@ -30,13 +30,22 @@ public static class CreateUserHandlerTestData
         .RuleFor(u => u.Role, f => f.PickRandom(UserRole.Customer, UserRole.Admin));
 
     /// <summary>
-    /// Generates a valid User entity with randomized data.
-    /// The generated user will have all properties populated with valid values
-    /// that meet the system's validation requirements.
+    /// Generates a valid CreateUserCommand instance.
     /// </summary>
-    /// <returns>A valid User entity with randomly generated data.</returns>
-    public static CreateUserCommand GenerateValidCommand()
-    {
-        return createUserHandlerFaker.Generate();
-    }
+    public static CreateUserCommand GenerateValidCommand() => createUserHandlerFaker.Generate();
+
+    /// <summary>
+    /// Generates an invalid CreateUserCommand instance.
+    /// Useful for negative test scenarios.
+    /// </summary>
+    public static CreateUserCommand GenerateInvalidCommand() =>
+        new CreateUserCommand
+        {
+            Username = "",                // Empty username
+            Password = "123",             // Weak password
+            Email = "invalid-email",      // Invalid email format
+            Phone = "999",                // Invalid phone
+            Status = (UserStatus)999,     // Invalid enum
+            Role = (UserRole)999          // Invalid enum
+        };
 }
