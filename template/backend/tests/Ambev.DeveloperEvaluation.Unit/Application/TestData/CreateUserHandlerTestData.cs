@@ -12,7 +12,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Domain;
 public static class CreateUserHandlerTestData
 {
     /// <summary>
-    /// Configures the Faker to generate valid User entities.
+    /// Configures the Faker to generate valid CreateUserCommand instances.
     /// The generated users will have valid:
     /// - Username (using internet usernames)
     /// - Password (meeting complexity requirements)
@@ -21,7 +21,7 @@ public static class CreateUserHandlerTestData
     /// - Status (Active or Suspended)
     /// - Role (Customer or Admin)
     /// </summary>
-    private static readonly Faker<CreateUserCommand> createUserHandlerFaker = new Faker<CreateUserCommand>()
+    private static readonly Faker<CreateUserCommand> createUserHandlerFaker = new Faker<CreateUserCommand>("pt_BR")
         .RuleFor(u => u.Username, f => f.Internet.UserName())
         .RuleFor(u => u.Password, f => $"Test@{f.Random.Number(100, 999)}")
         .RuleFor(u => u.Email, f => f.Internet.Email())

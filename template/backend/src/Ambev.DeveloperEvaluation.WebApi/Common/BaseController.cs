@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Ambev.DeveloperEvaluation.WebApi.Common.Responses;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Common;
 
@@ -8,38 +9,31 @@ namespace Ambev.DeveloperEvaluation.WebApi.Common;
 public class BaseController : ControllerBase
 {
     protected int GetCurrentUserId() =>
-            int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new NullReferenceException());
+        int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new NullReferenceException());
 
     protected string GetCurrentUserEmail() =>
         User.FindFirst(ClaimTypes.Email)?.Value ?? throw new NullReferenceException();
 
     protected IActionResult Ok<T>(T data) =>
-            base.Ok(new ApiResponseWithData<T> { Data = data, Success = true });
+        base.Ok(ApiResponse<T>.Ok(data));
 
-    protected IActionResult Ok<T>(T data, string message) =>
-        base.Ok(new ApiResponseWithData<T> { Data = data, Success = true, Message = message });
-
-    protected IActionResult Created<T>(string routeName, object routeValues, T data, string message) =>
-        base.CreatedAtRoute(routeName, routeValues, new ApiResponseWithData<T>
-        {
-            Data = data,
-            Success = true,
-            Message = message
-        });
+    protected IActionResult Created<T>(string routeName, object routeValues, T data) =>
+        base.CreatedAtRoute(routeName, routeValues, ApiResponse<T>.Ok(data, "Created"));
 
     protected IActionResult BadRequest(string message) =>
-        base.BadRequest(new ApiResponse { Message = message, Success = false });
+        base.BadRequest(ApiResponse<string>.Fail(message, "Bad request"));
 
     protected IActionResult NotFound(string message = "Resource not found") =>
-        base.NotFound(new ApiResponse { Message = message, Success = false });
+        base.NotFound(ApiResponse<string>.Fail(message, "Not found"));
 
     protected IActionResult OkPaginated<T>(PaginatedList<T> pagedList) =>
-        Ok(new PaginatedResponse<T>
+        base.Ok(new PaginatedResponse<T>
         {
             Data = pagedList,
             CurrentPage = pagedList.CurrentPage,
             TotalPages = pagedList.TotalPages,
             TotalCount = pagedList.TotalCount,
-            Success = true
+            Success = true,
+            Message = "Paged data returned"
         });
 }

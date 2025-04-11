@@ -2,6 +2,7 @@
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using FluentValidation;
 using System.Text.Json;
+using Ambev.DeveloperEvaluation.WebApi.Common.Responses;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Middleware
 {
@@ -31,12 +32,11 @@ namespace Ambev.DeveloperEvaluation.WebApi.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            var response = new ApiResponse
+            var response = new ApiResponse<string>
             {
                 Success = false,
                 Message = "Validation Failed",
-                Errors = exception.Errors
-                    .Select(error => (ValidationErrorDetail)error)
+                Errors = exception.Errors.Select(e => e.ErrorMessage).ToList()
             };
 
             var jsonOptions = new JsonSerializerOptions

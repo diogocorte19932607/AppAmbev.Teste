@@ -45,10 +45,9 @@ public class CreateUserHandlerTests
         // Dados adicionais com Faker
         var faker = new Faker("pt_BR");
         command = new Faker<CreateUserCommand>("pt_BR")
-            .RuleFor(x => x.Name, f => f.Name.FullName())
+            .RuleFor(x => x.Username, f => f.Name.FullName())
             .RuleFor(x => x.Email, f => f.Internet.Email())
-            .RuleFor(x => x.PhoneNumber, f => f.Phone.PhoneNumber())
-            .RuleFor(x => x.Document, f => f.Random.Replace("###.###.###-##"))
+            .RuleFor(x => x.Phone, f => f.Phone.PhoneNumber())
             .RuleFor(x => x.Password, f => f.Internet.Password(8))
             .Generate();
 
