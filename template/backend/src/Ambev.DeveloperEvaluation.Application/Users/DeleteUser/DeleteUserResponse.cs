@@ -9,4 +9,9 @@ public class DeleteUserResponse
     /// Indicates whether the deletion was successful
     /// </summary>
     public bool Success { get; set; }
+
+    /// <summary>
+    /// Indicates whether the deletion was successful for id
+    /// </summary>
+    public Guid Id { get; set; }
 }

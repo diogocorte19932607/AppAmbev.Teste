@@ -8,6 +8,7 @@ using FluentAssertions;
 using NSubstitute;
 using Xunit;
 using Bogus;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Unit.Application;
 
@@ -40,15 +41,14 @@ public class CreateUserHandlerTests
     public async Task Handle_ValidRequest_ReturnsSuccessResponse()
     {
         // Given
-        var command = CreateUserHandlerTestData.GenerateValidCommand();
-
-        // Dados adicionais com Faker
         var faker = new Faker("pt_BR");
-        command = new Faker<CreateUserCommand>("pt_BR")
+        var command = new Faker<CreateUserCommand>("pt_BR")
             .RuleFor(x => x.Username, f => f.Name.FullName())
             .RuleFor(x => x.Email, f => f.Internet.Email())
             .RuleFor(x => x.Phone, f => f.Phone.PhoneNumber())
             .RuleFor(x => x.Password, f => f.Internet.Password(8))
+            .RuleFor(x => x.Role, f => f.PickRandom<UserRole>())
+            .RuleFor(x => x.Status, f => f.PickRandom<UserStatus>())
             .Generate();
 
         var user = new User
@@ -62,10 +62,7 @@ public class CreateUserHandlerTests
             Role = command.Role
         };
 
-        var result = new CreateUserResult
-        {
-            Id = user.Id,
-        };
+        var result = new CreateUserResult { Id = user.Id };
 
         _mapper.Map<User>(command).Returns(user);
         _passwordHasher.HashPassword(command.Password).Returns("hashedPassword");
